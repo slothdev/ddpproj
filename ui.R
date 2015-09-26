@@ -20,12 +20,12 @@ shinyUI(pageWithSidebar(
                     "Number of Simulations (slide to select)",
                     min = 1, 
                     max = 1000,
-                    value = 50)
+                    value = 50),
         sliderInput("n",
                     "Number of Observations (slide to select)",
                     min = 1, 
                     max = 1000,
-                    value = 50),
+                    value = 50)
         ),
     
     # mainPanel: Show a plot of the generated map
