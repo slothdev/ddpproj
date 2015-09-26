@@ -1,0 +1,9 @@
+base
+slidify
+knitr
+sp
+shiny
+ggplot2
+gridExtra
+shinyapps
+devtools

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo Shiny App</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Demo Shiny App">
+  <meta name="author" content="Edwin Seah, 20150927">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Demo Shiny App</h1>
+    <h2>Exploring the exponential and poisson distributions</h2>
+    <p>Edwin Seah, 20150927<br/>Course Project</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Exploring the Exponential and Poisson Distributions through an Interactive Demo</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Using the app, the Exponential and Poisson Distributions (both use the parameter lambda (\(\lambda\))) will demonstrate how the Central Limit Theorem (CLT) relates to them. As the number of sample means goes up, the means and variances tend towards their theoretical values. However, with large numbers of counts/observations, we can see that while these provide good mean estimates, the variance is demonstrably larger.</p>
+
+<p>Our goal is to illustrate these differences between mean and variance derived from simulation, observation and their expected(theoretical) values in an easy-to-use interative demo.</p>
+
+<p>The demo provides the usage of the following user inputs through these controls:</p>
+
+<ul>
+<li>choice of distribution - dropdown</li>
+<li>\(\lambda\) - numeric input</li>
+<li>number of observations, number of simulations - sliders</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>User inputs and Calculation</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The simulation reacts to user inputs and loops using <code>rexp()</code> and <code>rpois()</code>, then tabulated and plotted against the expected values. The theoretical population mean and variance used are:</p>
+
+<ul>
+<li>For poisson, both are set as \(\lambda\)</li>
+<li>For exponential, \(\mu\) = \(\frac{1}{\lambda}\) and standard deviation \(\sigma\) = \(\frac{1/\lambda}{\sqrt(n)}\)</li>
+</ul>
+
+<pre><code class="r"># Partial example with sample inputs for simulated values of an exponential distribution
+set.seed(500); lambda &lt;- 0.1; n &lt;- 50; nsim &lt;- 1000; expmns &lt;- NULL
+for (i in 1:nsim) expmns = c(expmns, mean(rexp(n, lambda))) # Simulation loop
+mS &lt;- mean(expmns) ; vS &lt;- sd(expmns)^2         # Sample mean mS, variance vS
+mE &lt;- 1/lambda ; vE &lt;- ((1/lambda)/sqrt(n))^2   # Expected mean mT and variance vT
+stats &lt;- rbind(mean=c(mS, mE), variance=c(vS, vE))
+colnames(stats) &lt;- c(&quot;Simulated&quot;, &quot;Expected&quot;) ; stats
+</code></pre>
+
+<pre><code>##          Simulated Expected
+## mean      9.990137       10
+## variance  2.096757        2
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Plots generated with ggplot2</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">g &lt;- ggplot(data.frame(expmns), aes(x=expmns)) + 
+    geom_histogram(alpha = .40, binwidth = .3, colour = &quot;blue&quot;, aes(y = ..density..)) + 
+    geom_vline(xintercept = mS, size=1, color=&quot;red&quot;) + 
+    geom_vline(xintercept = mE, size=1, color=&quot;black&quot;) + 
+    labs(title=&quot;Distribution of sample Means from &quot;, nsim, &quot; Simulations of &quot;, n,&quot; observations with lambda=&quot;, lambda)
+g + stat_function(fun = dnorm, args=list(mean=mE, sd=sqrt(vE)))
+</code></pre>
+
+<p><img src="assets/fig/plot_simulation-1.png" title="plot of chunk plot_simulation" alt="plot of chunk plot_simulation" style="display: block; margin: auto;" /></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Reproducibility and Code links</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The app can be run online: <a href="https://slothdev.shinyapps.io/ddpproj/">Shiny app hosted by RStudio</a></p>
+
+<p>In order to run the app locally in RStudio (please check package and installation requirements in RStudio&#39;s <a href="http://shiny.rstudio.com/articles/shinyapps.html">Getting Started page</a>, then simply use the console command from RStudio:</p>
+
+<pre><code class="r">runGitHub(&#39;slothdev/ddpproj&#39;)
+</code></pre>
+
+<p>Links to the app and code repository:</p>
+
+<ul>
+<li>All files and code used are available from my <a href="https://github.com/slothdev/ddpproj">Github Project Repository</a> (<a href="https://github.com/slothdev/ddpproj">https://github.com/slothdev/ddpproj</a>)</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Exploring the Exponential and Poisson Distributions through an Interactive Demo'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='User inputs and Calculation'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Plots generated with ggplot2'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Reproducibility and Code links'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
