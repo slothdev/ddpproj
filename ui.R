@@ -12,25 +12,25 @@ shinyUI(pageWithSidebar(
     sidebarPanel(
         uiOutput("distControls"),
         numericInput("lambda",
-                     withMathJax("$$\\lambda$$"),
+                     "Lambda (rate parameter value)",
                      value = 0.1,
                      step = 0.1,
                      min = 0),
-        sliderInput("n",
-                    "Number of Observations",
-                    min = 1, 
-                    max = 1000,
-                    value = 40),
         sliderInput("nsim",
-                    "Number of Simulations",
+                    "Number of Simulations (slide to select)",
                     min = 1, 
                     max = 1000,
-                    value = 10)
-    ),
+                    value = 50)
+        sliderInput("n",
+                    "Number of Observations (slide to select)",
+                    min = 1, 
+                    max = 1000,
+                    value = 50),
+        ),
     
     # mainPanel: Show a plot of the generated map
     mainPanel(
-        h3(textOutput("dist")),
+        h4(textOutput("dist")),
         h6(tableOutput("view_sim")),
         plotOutput("simPlot"),
         h6(tableOutput("view_largeN_obs")),

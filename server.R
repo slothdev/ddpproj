@@ -1,6 +1,5 @@
 library(shiny)
 library(ggplot2)
-library(gridExtra)
 
 # Set RNG seed
 set.seed(42)
@@ -8,7 +7,7 @@ set.seed(42)
 # Define server logic required to generate and plot voter distrubtion
 shinyServer(function(input, output) {
 
-    # Dynamic UI output: Reactively changes computation to the slelected distribution
+    # Dynamic UI output for input$dist: Reactively changes computation to the slelected distribution
     output$distControls <- renderUI({
         selectInput("dist", 
                     "Distribution", 
@@ -16,6 +15,7 @@ shinyServer(function(input, output) {
                     selected = "exponential")
     })
 
+    # Value "distInput": 
     # Stores the selected distribution type in distInput for later use
     distInput <- reactive({
         if (is.null(input$dist)) return("rexp")
@@ -25,17 +25,11 @@ shinyServer(function(input, output) {
         distSelected
     })
         
+    # Value "valuesSimulated": 
     # Reactively computes SIMULATED sample means for the selected distribution
-    # isolate the calculation if nsim is unchanged from sliderInput
     valuesSimulated <- reactive({
         means <- NULL
         switch(distInput(),
-#                rexp = isolate(for (i in 1:input$nsim) means = c(means, 
-#                                                         mean(rexp(input$n, 
-#                                                                   input$lambda)))),
-#                rpois = isolate(for (i in 1:input$nsim) means = c(means, 
-#                                                          mean(rpois(input$n, 
-#                                                                     input$lambda))))
                rexp = for (i in 1:input$nsim) means = c(means,
                                                         mean(rexp(input$n,
                                                                   input$lambda))),
@@ -46,6 +40,7 @@ shinyServer(function(input, output) {
         means
     })
 
+    # Value "valuesExpected": 
     # Reactively computes EXPECTED mean and variance values for the selected distribution
     # Expected mean of Exponential distribution is 1/lambda, var is (1/lambda/sqrt(n))^2
     # Expected mean and variance of Poisson distribution both are lambda
@@ -59,6 +54,7 @@ shinyServer(function(input, output) {
         expected
     })
 
+    # Value "valuesObserved": 
     # Reactively computes the selected distribution of n observations
     valuesObserved <- reactive({
         observed <- NULL
@@ -71,17 +67,13 @@ shinyServer(function(input, output) {
 
     # Output Text "dist": Application title
     output$dist <- renderText({
-        paste0("Differences between the simulated and expected mean/variances for the ", 
-               input$dist, " distribution")
+        paste0("Use the sidebar inputs to see the differences between simulated and expected (theoretical) means and variances for the ", input$dist, " distribution.")
     })
-
-#     valuesM2 <- reactive({
-#         m2 <- NULL
-#         lapply(1:5, function(i) m2[i] = mean(rexp(input$n, input$lambda)))
-#         #for (i in 1:input$nsim) m2 = c(m2, mean(rexp(input$n, input$lambda)))
-#         m2[i]
-#     })
-
+    
+    output$instructions <- renderText({
+        "Plots change according to inputs.The first plot shows the distribution of sample means from simulation. The second plot shows the distribution of n observations."
+        })
+    
     # Output Table "view_sim": Simulated vs Expected mean and variance
     output$view_sim <- renderTable({
         mS <- mean(valuesSimulated()) # Sample mean mS
@@ -89,7 +81,6 @@ shinyServer(function(input, output) {
         mE <- valuesExpected()[1]
         vE <- valuesExpected()[2]        
         stats <- rbind(mean=c(mS, mE), variance=c(vS, vE))
-        #stats <- cbind(mean=valuesSimulated(), variance=valuesExpected())
         colnames(stats) <- c("Simulated", "Expected")
         print(stats)
     })
@@ -98,16 +89,10 @@ shinyServer(function(input, output) {
     output$view_largeN_obs <- renderTable({
         mE <- valuesExpected()[1] # Expected mean mS
         vE <- valuesExpected()[2] # Expected variance vS
-        cat(valuesExpected())
         stats1 <- rbind(mean=c(mean(valuesObserved()), mE), variance=c(var(valuesObserved()), vE))
         colnames(stats1) <- c("Observed", "Expected")
         print(stats1)
     })
-
-    # Expression that generates a plot of the distribution
-    # Expression is wrapped in a call to renderPlot indicating:
-    # 1) It is "reactive" and therefore should be automatically re-executed when inputs change
-    # 2) Its output type is a plot
 
     # Output Plot "simPlot": Plot of sample means from input$nsim simulations
     output$simPlot <- renderPlot({
@@ -129,10 +114,8 @@ shinyServer(function(input, output) {
         g <- g + labs(title = paste0("Distribution of sample Means from ", 
                                      input$nsim," Simulations of ", 
                                      input$n," observations ", lambdaLabel),
-                      x = "mean_simulated")
+                      x = "sample_mean")
         g + stat_function(fun = dnorm, args = list(mean = mE, sd = sqrt(vE)))
-        #grid.arrange(g, g1, nrow = 2)
-        #g + stat_function(fun = dnorm, args=list(mean=mE, sd=sqrt(vE)))
     })
 
     # Output Plot "obsPlot": Plot of distribution of input$n observations
