@@ -9,6 +9,9 @@ hitheme     : tomorrow      #
 widgets     : mathjax       # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
+output: 
+    html_document:
+        keep_md: true
 ---
 
 ## Exploring the Exponential and Poisson Distributions through an Interactive Demo

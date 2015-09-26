@@ -1,18 +1,6 @@
----
-title       : Demo Shiny App
-subtitle    : Exploring the exponential and poisson distributions
-author      : Edwin Seah, 20150927
-job         : Course Project
-framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
-highlighter : highlight.js  # {highlight.js, prettify, highlight}
-hitheme     : tomorrow      # 
-widgets     : mathjax       # {mathjax, quiz, bootstrap}
-mode        : selfcontained # {standalone, draft}
-knit        : slidify::knit2slides
-output: 
-    html_document:
-        keep_md: true
----
+# Demo Shiny App - Exploring the exponential and poisson distributions
+Edwin Seah  
+27 September 2015  
 
 ## Exploring the Exponential and Poisson Distributions through an Interactive Demo
 
@@ -32,7 +20,8 @@ The demo provides the usage of the following user inputs through these controls:
 The simulation reacts to user inputs and loops using `rexp()` and `rpois()`, then tabulated and plotted against the expected values. The theoretical population mean and variance used are:
 + For poisson, both are set as $\lambda$
 + For exponential, $\mu$ = $\frac{1}{\lambda}$ and standard deviation $\sigma$ = $\frac{1/\lambda}{\sqrt(n)}$
-```{r simulation_exp}
+
+```r
 # Partial example with sample inputs for simulated values of an exponential distribution
 set.seed(500); lambda <- 0.1; n <- 50; nsim <- 1000; expmns <- NULL
 for (i in 1:nsim) expmns = c(expmns, mean(rexp(n, lambda))) # Simulation loop
@@ -42,14 +31,19 @@ stats <- rbind(mean=c(mS, mE), variance=c(vS, vE))
 colnames(stats) <- c("Simulated", "Expected") ; stats
 ```
 
+```
+##          Simulated Expected
+## mean      9.990137       10
+## variance  2.096757        2
+```
+
 ---
 
 ## Plots generated with ggplot2
 
-```{r load_ggplot, echo=FALSE}
-library(ggplot2)
-```
-```{r plot_simulation, fig.width=5, fig.height=5, fig.align='center'}
+
+
+```r
 g <- ggplot(data.frame(expmns), aes(x=expmns)) + 
     geom_histogram(alpha = .40, binwidth = .3, colour = "blue", aes(y = ..density..)) + 
     geom_vline(xintercept = mS, size=1, color="red") + 
@@ -58,6 +52,8 @@ g <- ggplot(data.frame(expmns), aes(x=expmns)) +
 g + stat_function(fun = dnorm, args=list(mean=mE, sd=sqrt(vE)))
 ```
 
+<img src="readme_files/figure-html/plot_simulation-1.png" title="" alt="" style="display: block; margin: auto;" />
+
 ---
 
 ## Reproducibility and Code links
@@ -65,7 +61,8 @@ g + stat_function(fun = dnorm, args=list(mean=mE, sd=sqrt(vE)))
 The app can be run online: [Shiny app hosted by RStudio](https://slothdev.shinyapps.io/ddpproj/)
 
 In order to run the app locally in RStudio (please check package and installation requirements in RStudio's [Getting Started page](http://shiny.rstudio.com/articles/shinyapps.html), then simply use the console command from RStudio:
-```{r local_app, eval=FALSE} 
+
+```r
 runGitHub('slothdev/ddpproj')
 ```
 
